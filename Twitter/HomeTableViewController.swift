@@ -21,6 +21,14 @@ class HomeTableViewController: UITableViewController {
         
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = myRefreshControl
+        self.tableView.rowHeight = UITableView.automaticDimension
+        self.tableView.estimatedRowHeight = 150
+        
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
     }
 
     @objc func loadTweets(){
@@ -94,20 +102,11 @@ class HomeTableViewController: UITableViewController {
         
  
         cell.atHandle.text = user["screen_name"] as? String
-        
-        //myString = String(stringInterpolationSegment:"@ \(user["screen_name"])" as String
-  
-        
         cell.userNameLabel.text = user["name"] as? String
-        //cell.atHandle.text = "@ \(user["screen_name"])" as String
-        
-        //cell.atHandle.text = myString as? String
-        
-    
         cell.dateCreated.text = tweetArray[indexPath.row]["created_at"] as? String
-        cell.commentNumber.text = String(describing: tweetArray[indexPath.row]["reply_count"]) as String
-        cell.retweetNumber.text = String(describing:tweetArray[indexPath.row]["retweet_count"]) as String
-        cell.likeNumber.text = String(describing:tweetArray[indexPath.row]["favourites_count"]) as String
+        //cell.commentNumber.text = String(describing: tweetArray[indexPath.row]["reply_count"]) as String
+        //cell.retweetNumber.text = String(describing:tweetArray[indexPath.row]["retweet_count"]) as String
+        //cell.likeNumber.text = String(describing:tweetArray[indexPath.row]["favourites_count"]) as String
         cell.tweetContent.text = tweetArray[indexPath.row]["text"] as? String
         
         let imageUrl = URL(string: (user["profile_image_url_https"] as? String)!)
@@ -117,6 +116,9 @@ class HomeTableViewController: UITableViewController {
             cell.profileImageView.image = UIImage(data: imageData)
         }
         
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
+        cell.setFavorited(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
         return cell
     }
     
