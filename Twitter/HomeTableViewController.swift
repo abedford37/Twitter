@@ -35,7 +35,6 @@ class HomeTableViewController: UITableViewController {
         
         numberOfTweets = 20
         
-        
         let myUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json"
         let myParams = ["count": numberOfTweets]
         
@@ -99,7 +98,7 @@ class HomeTableViewController: UITableViewController {
         //let dateFormattedString = convertDateStringToDate(longDate: "\(tweetArray[indexPath.row]["created_at"])") as? String
         
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
-        
+        let entities = tweetArray[indexPath.row]["entities"] as! NSDictionary
  
         cell.atHandle.text = user["screen_name"] as? String
         cell.userNameLabel.text = user["name"] as? String
@@ -114,6 +113,18 @@ class HomeTableViewController: UITableViewController {
         
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
+        }
+        
+        if let media = entities.value(forKey: "media") as? [[String:Any]], !media.isEmpty,
+            let mediaUrl = URL(string: (media[0]["media_url_https"] as? String)!) {
+            let data = try? Data(contentsOf: mediaUrl)
+            let mediaType = (media[0]["type"] as? String)!
+
+            if mediaType == "photo" {
+                if let mediaData = data {
+                    cell.mediaImageView.image = UIImage(data: mediaData)
+                }
+            }
         }
         
         cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)

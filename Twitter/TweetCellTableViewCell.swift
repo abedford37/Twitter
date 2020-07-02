@@ -12,6 +12,7 @@ class TweetCellTableViewCell: UITableViewCell {
 
     
     @IBOutlet weak var profileImageView: UIImageView!
+    @IBOutlet weak var mediaImageView: UIImageView!
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var tweetContent: UILabel!
     @IBOutlet weak var atHandle: UILabel!
@@ -21,6 +22,10 @@ class TweetCellTableViewCell: UITableViewCell {
     @IBOutlet weak var likeNumber: UILabel!
     @IBOutlet weak var retweetButton: UIButton!
     @IBOutlet weak var favButton: UIButton!
+    
+    var favorited:Bool = false
+    var tweetId:Int = -1
+    
     @IBAction func favoriteTweet(_ sender: Any) {
         let tobeFavorited = !favorited
         if (tobeFavorited) {
@@ -57,9 +62,6 @@ class TweetCellTableViewCell: UITableViewCell {
             retweetButton.isEnabled = true
         }
     }
-    
-    var favorited:Bool = false
-    var tweetId:Int = -1
     
     func setFavorited(_ isFavorited:Bool){
         favorited = isFavorited

@@ -8,20 +8,34 @@
 
 import UIKit
 
-class TweetViewController: UIViewController {
+class TweetViewController: UIViewController, UITextViewDelegate {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        tweetTextView.becomeFirstResponder()
-
-        // Do any additional setup after loading the view.
+    
+    @IBOutlet weak var charLabel: UILabel!
+    
+    @IBOutlet weak var tweetTextView: UITextView! {
+        didSet {
+            tweetTextView.delegate = self
+            tweetTextView.becomeFirstResponder()
+        }
+        
     }
     
-    @IBOutlet weak var tweetTextView: UITextView!
+    let charcountLimit = 140
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+        
+        charLabel.text = "140"
+        
+    }
     
     @IBAction func cancel(_ sender: Any) {
         dismiss(animated: true, completion: nil)
     }
+    
     @IBAction func tweet(_ sender: Any) {
         if(!tweetTextView.text.isEmpty){
             TwitterAPICaller.client?.postTweet(tweetString: tweetTextView.text, success: {
@@ -33,6 +47,34 @@ class TweetViewController: UIViewController {
         } else {
             self.dismiss(animated: true, completion: nil)
         }
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        //TODO: Check the proposed new text character count
+    
+        //Set the max character limit
+        
+        
+        //Construct what the new text would be if we allowed the user's latest edit
+        let newText = NSString(string: textView.text!).replacingCharacters(in: range, with: text)
+        
+        //TODO: Update Character Count label
+        let remainingChars = charcountLimit - newText.count
+        
+        charLabel.text = String(remainingChars)
+        
+        if remainingChars > 20 {
+            charLabel.textColor = UIColor.black
+        }
+        if remainingChars <= 20 {
+            charLabel.textColor = UIColor.red
+        }
+        if remainingChars < 0 {
+            charLabel.text = "0"
+        }
+        
+        //Allow or disallow the new text
+        return newText.count <= charcountLimit
     }
     /*
     // MARK: - Navigation
