@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import Foundation
 
 class HomeTableViewController: UITableViewController {
 
     var tweetArray = [NSDictionary]()
     var numberOfTweets: Int!
+    var verifiedStatus: Bool!
     
     let myRefreshControl = UIRefreshControl()
     
@@ -50,7 +52,7 @@ class HomeTableViewController: UITableViewController {
             self.myRefreshControl.endRefreshing()
             
         }, failure: { (Error) in
-            print("Could not retrieve tweets! oh no!")
+            print("Could not retrieve tweets! oh no!1")
         })
     }
     
@@ -71,7 +73,7 @@ class HomeTableViewController: UITableViewController {
             }
             self.tableView.reloadData()
         }, failure: { (Error) in
-            print("Could not retrieve tweets! oh no!")
+            print("Could not retrieve tweets! oh no!2")
         })
     }
     
@@ -100,9 +102,49 @@ class HomeTableViewController: UITableViewController {
         let user = tweetArray[indexPath.row]["user"] as! NSDictionary
         let entities = tweetArray[indexPath.row]["entities"] as! NSDictionary
  
-        cell.atHandle.text = user["screen_name"] as? String
+        let username = user["screen_name"] as! String
+        cell.atHandle.text = "@" + username
+        
         cell.userNameLabel.text = user["name"] as? String
-        cell.dateCreated.text = tweetArray[indexPath.row]["created_at"] as? String
+        
+        //Convert date format to month (3 letters),DD YY
+        let createdAtOriginalString = (tweetArray[indexPath.row]["created_at"] as? String)!
+        let formatter = DateFormatter()
+        // Configure the input format to parse the date string
+        formatter.dateFormat = "E MMM d HH:mm:ss Z y"
+        // Convert String to Date
+        let date = formatter.date(from: createdAtOriginalString)
+        // Configure output format
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        // Convert Date to String
+        let createdAtString = formatter.string(from: date!)
+        
+        cell.dateCreated.text = " · \(createdAtString)" as String
+        
+        let numberFormatter = NumberFormatter()
+           numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        let formattedRetweets = numberFormatter.string(from: NSNumber(value: (tweetArray[indexPath.row]["retweet_count"] as? Int)!))!
+        let formattedLikes = numberFormatter.string(from: NSNumber(value: (tweetArray[indexPath.row]["favorite_count"] as? Int)!))!
+
+        
+        cell.retweetNumber.text = formattedRetweets
+        cell.likeNumber.text = formattedLikes
+        
+        let verifiedStatus = user["verified"] as! Bool
+        
+        if (verifiedStatus == false)
+        {
+            cell.verifiedLeading.constant = 0
+            cell.verifiedWidth.constant = 0
+            cell.verifiedImage.isHidden = true
+        } else {
+            cell.verifiedImage.isHidden = false
+            cell.verifiedLeading.constant = 3
+            cell.verifiedWidth.constant = 14
+        }
+        //tweetArray[indexPath.row]["created_at"] as? String
+        
         //cell.commentNumber.text = String(describing: tweetArray[indexPath.row]["reply_count"]) as String
         //cell.retweetNumber.text = String(describing:tweetArray[indexPath.row]["retweet_count"]) as String
         //cell.likeNumber.text = String(describing:tweetArray[indexPath.row]["favourites_count"]) as String
@@ -114,8 +156,24 @@ class HomeTableViewController: UITableViewController {
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
         }
+       
         
+         if let media = entities["media"] as? [[String: Any]] {
+           let mediaObj = media[0]
+           let mediaURL = mediaObj["media_url_https"]
+            cell.mediaUrl = URL(string: (mediaURL as? String)!)
+       }
+
+        
+        if cell.mediaUrl != nil {
+            cell.mediaImageView.setImageWith(cell.mediaUrl!)
+            cell.imageHeight.constant = 200
+        } else {
+            cell.imageHeight.constant = 0
+        
+        /*
         if let media = entities.value(forKey: "media") as? [[String:Any]], !media.isEmpty,
+            
             let mediaUrl = URL(string: (media[0]["media_url_https"] as? String)!) {
             let data = try? Data(contentsOf: mediaUrl)
             let mediaType = (media[0]["type"] as? String)!
@@ -125,6 +183,18 @@ class HomeTableViewController: UITableViewController {
                     cell.mediaImageView.image = UIImage(data: mediaData)
                 }
             }
+            
+            //HERE down
+            //cell.mediaUrl = mediaUrl
+            
+            if cell.mediaUrl != nil {
+                cell.mediaImageView.setImageWith(mediaUrl)
+                cell.imageHeight.constant = 200
+            } else {
+                cell.imageHeight.constant = 0
+            
+            }*/
+            
         }
         
         cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
@@ -144,18 +214,6 @@ class HomeTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return tweetArray.count
-    }
-
-    func convertDateStringToDate(longDate: String) -> String{
-        let longDateFormatter = DateFormatter()
-        longDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        if let date = longDateFormatter.date(from: longDate) {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "yy MMM dd"
-            return dateFormatter.string(from: date)
-        } else {
-            return longDate
-        }
     }
     
 }

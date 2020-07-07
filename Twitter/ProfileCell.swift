@@ -1,35 +1,49 @@
 //
-//  TweetCellTableViewCell.swift
+//  ProfileCell.swift
 //  Twitter
 //
-//  Created by Ashley Bedford on 3/2/19.
-//  Copyright © 2019 Dan. All rights reserved.
+//  Created by Ashley Bedford on 7/4/20.
+//  Copyright © 2020 Dan. All rights reserved.
 //
 
 import UIKit
 
-class TweetCellTableViewCell: UITableViewCell {
+class ProfileCell: UITableViewCell {
 
-    
+    //profileImageView
     @IBOutlet weak var profileImageView: UIImageView!
+    //mediaImageView
     @IBOutlet weak var mediaImageView: UIImageView!
+    //userNameLabel
     @IBOutlet weak var userNameLabel: UILabel!
+    //tweetContent
     @IBOutlet weak var tweetContent: UILabel!
+    //atHandle
     @IBOutlet weak var atHandle: UILabel!
+    //dateCreated
     @IBOutlet weak var dateCreated: UILabel!
-    @IBOutlet weak var retweetButton: UIButton!
-    @IBOutlet weak var favButton: UIButton!
-    @IBOutlet weak var imageHeight: NSLayoutConstraint!
+    //retweetNumber
     @IBOutlet weak var retweetNumber: UILabel!
+    //likeNumber
     @IBOutlet weak var likeNumber: UILabel!
+    //retweetButton
+    @IBOutlet weak var retweetButton: UIButton!
+    //favButton
+    @IBOutlet weak var favButton: UIButton!
+    //imageHeight
+    @IBOutlet weak var imageHeight: NSLayoutConstraint!
+    //verifiedImage
     @IBOutlet weak var verifiedImage: UIImageView!
+    //verifiedLeading
     @IBOutlet weak var verifiedLeading: NSLayoutConstraint!
+    //verifiedWidth
     @IBOutlet weak var verifiedWidth: NSLayoutConstraint!
     
     var favorited:Bool = false
     var tweetId:Int = -1
     var mediaUrl: URL?
     
+    //ibaction favoriteTweet
     @IBAction func favoriteTweet(_ sender: Any) {
         let tobeFavorited = !favorited
         if (tobeFavorited) {
@@ -45,15 +59,19 @@ class TweetCellTableViewCell: UITableViewCell {
                 print("Unfavorite did not succeed: \(error)")
             })
         }
+        
     }
     
+    //ibaction retweet
     @IBAction func retweet(_ sender: Any) {
         TwitterAPICaller.client?.retweet(tweetId: tweetId, success: {
             self.setRetweeted(true)
         }, failure: { (error) in
             print("Error is retweeting: \(error)")
         })
+        
     }
+    
     
     func setRetweeted(_ isRetweeted:Bool) {
         if (isRetweeted) {
@@ -89,5 +107,5 @@ class TweetCellTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    
+
 }
